@@ -78,7 +78,7 @@ class AccountApiTests(TestCase):
         response = self.client.get(LOGIN_STATUS_URL)
         self.assertEqual(response.data['has_logged_in'], False)
 
-    def test_signup(self):
+    def test_sigup(self):
         data = {
             'username': 'someone',
             'email': 'someone@jiuzhang.com',
