@@ -19,23 +19,23 @@ class CommentApiTests(TestCase):
         self.tweet = self.create_tweet(self.linghu)
 
     def test_create(self):
-        # 匿名不可以创建
+        # anonymous cannot create comment
         response = self.anonymous_client.post(COMMENT_URL)
         self.assertEqual(response.status_code, 403)
 
-        # 啥参数都没带不行
+        # cannot create comment without any parameters
         response = self.linghu_client.post(COMMENT_URL)
         self.assertEqual(response.status_code, 400)
 
-        # 只带 tweet_id 不行
+        # cannot create comment with only tweet_id
         response = self.linghu_client.post(COMMENT_URL, {'tweet_id': self.tweet.id})
         self.assertEqual(response.status_code, 400)
 
-        # 只带 content 不行
+        # cannot create comment with only content
         response = self.linghu_client.post(COMMENT_URL, {'content': '1'})
         self.assertEqual(response.status_code, 400)
 
-        # content 太长不行
+        # comment cannot be too long
         response = self.linghu_client.post(COMMENT_URL, {
             'tweet_id': self.tweet.id,
             'content': '1' * 141,
@@ -43,7 +43,7 @@ class CommentApiTests(TestCase):
         self.assertEqual(response.status_code, 400)
         self.assertEqual('content' in response.data['errors'], True)
 
-        # tweet_id 和 content 都带才行
+        # comment should include both tweet_id and content
         response = self.linghu_client.post(COMMENT_URL, {
             'tweet_id': self.tweet.id,
             'content': '1',
@@ -104,6 +104,35 @@ class CommentApiTests(TestCase):
         response = self.linghu_client.delete(url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(Comment.objects.count(), count - 1)
+
+    def test_list(self):
+        # should include tweet_id to visit comments
+        response = self.anonymous_client.get(COMMENT_URL)
+        self.assertEqual(response.status_code, 400)
+
+        # you can visit comments with twitter_id, there is no comment at beginning
+        response = self.anonymous_client.get(COMMENT_URL, {
+            'tweet_id': self.tweet.id,
+        })
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data['comments']), 0)
+
+        # comments are ordered by time
+        self.create_comment(self.linghu, self.tweet, '1')
+        self.create_comment(self.dongxie, self.tweet, '2')
+        self.create_comment(self.dongxie, self.create_tweet(self.dongxie), '3')
+        response = self.anonymous_client.get(COMMENT_URL, {
+            'tweet_id': self.tweet.id,
+        })
+        self.assertEqual(len(response.data['comments']), 2)
+        self.assertEqual(response.data['comments'][0]['content'], '1')
+        self.assertEqual(response.data['comments'][1]['content'], '2')
+
+        response = self.anonymous_client.get(COMMENT_URL,{
+            'tweet_id': self.tweet.id,
+            'user_id': self.linghu.id,
+        })
+        self.assertEqual(len(response.data['comments']), 2)
 
 
 
