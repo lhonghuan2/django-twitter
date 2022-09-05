@@ -9,23 +9,21 @@ FOLLOWINGS_URL = '/api/friendships/{}/followings/'
 
 class FriendshipApiTests(TestCase):
     def setUp(self):
-        self.anonymous_client = APIClient()
-
-        self.linghu = self.create_user('linghu', 'linghu@jiuzhang.com')
+        self.linghu = self.create_user('linghu')
         self.linghu_client = APIClient()
         self.linghu_client.force_authenticate(self.linghu)
 
-        self.dongxie = self.create_user('dongxie', 'dongxie@jiuzhang.com')
+        self.dongxie = self.create_user('dongxie')
         self.dongxie_client = APIClient()
         self.dongxie_client.force_authenticate(self.dongxie)
 
         for i in range(2):
             user = 'dongxie_follower{}'.format(i)
-            follower = self.create_user(user, user+'@jiuzhang.com')
+            follower = self.create_user(user)
             Friendship.objects.create(from_user=follower, to_user=self.dongxie)
         for i in range(3):
             user = 'dongxie_following{}'.format(i)
-            following = self.create_user(user, user+'@jiuzhang.com')
+            following = self.create_user(user)
             Friendship.objects.create(from_user=self.dongxie, to_user=following)
 
     def test_follow(self):
