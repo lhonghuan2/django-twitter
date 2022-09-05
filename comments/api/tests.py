@@ -87,7 +87,23 @@ class CommentApiTests(TestCase):
         self.assertNotEqual(comment.created_at, now)
         self.assertNotEqual(comment.updated_at, before_updated_at)
 
+    def test_destroy(self):
+        comment = self.create_comment(self.linghu, self.tweet)
+        url = '{}{}/'.format(COMMENT_URL,comment.id)
 
+        # anonymous users cannot delete comments
+        response = self.anonymous_client.delete(url)
+        self.assertEqual(response.status_code, 403)
+
+        # non-comment owners cannot delete comments
+        response = self.dongxie_client.delete(url)
+        self.assertEqual(response.status_code, 403)
+
+        # comment owner could delete
+        count = Comment.objects.count()
+        response = self.linghu_client.delete(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(Comment.objects.count(), count - 1)
 
 
 
