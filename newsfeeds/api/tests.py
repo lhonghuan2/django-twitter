@@ -30,21 +30,20 @@ class NewsFeedApiTests(TestCase):
             Friendship.objects.create(from_user=self.dongxie, to_user=following)
 
     def test_list(self):
-        # 需要登录
         response = self.anonymous_client.get(NEWSFEEDS_URL)
         self.assertEqual(response.status_code, 403)
-        # 不能用 post
+
         response = self.linghu_client.post(NEWSFEEDS_URL)
         self.assertEqual(response.status_code, 405)
-        # 一开始啥都没有
+
         response = self.linghu_client.get(NEWSFEEDS_URL)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data['newsfeeds']), 0)
-        # 自己发的信息是可以看到的
+
         self.linghu_client.post(POST_TWEETS_URL, {'content': 'Hello World'})
         response = self.linghu_client.get(NEWSFEEDS_URL)
         self.assertEqual(len(response.data['newsfeeds']), 1)
-        # 关注之后可以看到别人发的
+
         self.linghu_client.post(FOLLOW_URL.format(self.dongxie.id))
         response = self.dongxie_client.post(POST_TWEETS_URL, {
             'content': 'Hello Twitter',

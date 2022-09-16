@@ -18,10 +18,10 @@ from django.urls import include, path
 from rest_framework import routers
 
 from accounts.api.views import UserViewSet, AccountViewSet
-from tweets.api.views import TweetViewSet
+from comments.api.views import CommentViewSet
 from friendships.api.views import FriendshipViewSet
 from newsfeeds.api.views import NewsFeedViewSet
-from comments.api.views import CommentViewSet
+from tweets.api.views import TweetViewSet
 
 router = routers.DefaultRouter()
 router.register(r'api/users', UserViewSet)
