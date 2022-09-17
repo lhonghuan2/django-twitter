@@ -22,7 +22,7 @@ def required_params(request_attr='query_params', params=None):
                     'message': u'missing {} in request'.format(params_str),
                     'success': False,
                 }, status=status.HTTP_400_BAD_REQUEST)
-            # 做完检测之后，再去调用被 @required_params 包裹起来的 view_func
+
             return view_func(instance, request, *args, **kwargs)
         return _wrapped_view
     return decorator
