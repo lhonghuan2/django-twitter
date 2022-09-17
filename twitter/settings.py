@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'friendships',
     'newsfeeds',
     'comments',
+    'likes',
 ]
 
 REST_FRAMEWORK = {
@@ -56,7 +57,8 @@ REST_FRAMEWORK = {
     'PAGE_SIZE': 10,
     'DEFAULT_FILTER_BACKENDS':[
         'django_filters.rest_framework.DjangoFilterBackend',
-    ],}
+    ],
+}
 
 MIDDLEWARE = [
     'debug_toolbar.middleware.DebugToolbarMiddleware',
@@ -101,7 +103,7 @@ DATABASES = {
         'HOST': '0.0.0.0',
         'PORT': '3306',
         'USER': 'root',
-        'PASSWORD': 'yourpassword',    # 这里是自己下载mysql时候输入两次的那个密码
+        'PASSWORD': 'yourpassword',
     }
 }
 

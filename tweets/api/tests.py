@@ -2,8 +2,6 @@ from rest_framework.test import APIClient
 from testing.testcases import TestCase
 from tweets.models import Tweet
 
-
-# 注意要加 '/' 结尾，要不然会产生 301 redirect
 TWEET_LIST_API = '/api/tweets/'
 TWEET_CREATE_API = '/api/tweets/'
 TWEET_RETRIEVE_API = '/api/tweets/{}/'
