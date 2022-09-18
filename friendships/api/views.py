@@ -2,15 +2,13 @@ from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
-from django.contrib.auth.models import User
 from friendships.models import Friendship
 from friendships.api.serializers import (
     FollowingSerializer,
     FollowerSerializer,
     FriendshipSerializerForCreate,
 )
-
-
+from django.contrib.auth.models import User
 
 class FriendshipViewSet(viewsets.GenericViewSet):
     queryset = User.objects.all()
@@ -19,7 +17,7 @@ class FriendshipViewSet(viewsets.GenericViewSet):
     def followers(self, request, pk):
         friendships = Friendship.objects.filter(to_user_id=pk).order_by('-created_at')
         serializer = FollowerSerializer(friendships, many=True)
-        return  Response(
+        return Response(
             {'followers': serializer.data},
             status=status.HTTP_200_OK,
         )
@@ -42,7 +40,7 @@ class FriendshipViewSet(viewsets.GenericViewSet):
             }, status=status.HTTP_201_CREATED)
         serializer = FriendshipSerializerForCreate(data={
             'from_user_id': request.user.id,
-            'to_user_id': pk
+            'to_user_id': pk,
         })
         if not serializer.is_valid():
             return Response({
@@ -63,4 +61,4 @@ class FriendshipViewSet(viewsets.GenericViewSet):
             from_user=request.user,
             to_user=pk,
         ).delete()
-        return Response({'success': True, 'deleted':deleted})
+        return Response({'success': True, 'deleted': deleted})

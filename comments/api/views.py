@@ -11,10 +11,6 @@ from comments.api.serializers import (
 from utils.decorators import required_params
 
 class CommentViewSet(viewsets.GenericViewSet):
-    """
-    只实现 list, create, update, destroy 的方法
-    不实现 retrieve（查询单个 comment） 的方法，因为没这个需求
-    """
     serializer_class = CommentSerializerForCreate
     queryset = Comment.objects.all()
     filterset_fields = ('tweet_id',)
@@ -41,7 +37,7 @@ class CommentViewSet(viewsets.GenericViewSet):
 
         comment = serializer.save()
         return Response(
-            CommentSerializer(comment).data,
+            CommentSerializer(comment, context={'request': request}).data,
             status=status.HTTP_201_CREATED,
         )
 
@@ -57,7 +53,7 @@ class CommentViewSet(viewsets.GenericViewSet):
             }, status=status.HTTP_400_BAD_REQUEST)
         comment = serializer.save()
         return Response(
-            CommentSerializer(comment).data,
+            CommentSerializer(comment, context={'request': request}).data,
             status=status.HTTP_200_OK,
         )
 
@@ -70,7 +66,11 @@ class CommentViewSet(viewsets.GenericViewSet):
     def list(self, request, *args, **kwargs):
         queryset = self.get_queryset()
         comments = self.filter_queryset(queryset).order_by('created_at')
-        serializer = CommentSerializer(comments, many=True)
+        serializer = CommentSerializer(
+            comments,
+            context={'request': request},
+            many=True
+        )
         return Response({
             'comments': serializer.data
         }, status=status.HTTP_200_OK, )
