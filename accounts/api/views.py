@@ -22,7 +22,7 @@ class UserViewSet(viewsets.ReadOnlyModelViewSet):
     permission_classes = (permissions.IsAuthenticated,)
 
 
-class AccountViewSet(viewsets.ViewSet):
+class AccountViewSet(viewsets.GenericViewSet):
     permission_classes = (AllowAny,)
     serializer_class = SignupSerializer
 

@@ -1,7 +1,8 @@
+from accounts.api.serializers import UserSerializer
+from friendships.models import Friendship
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
-from friendships.models import Friendship
-from accounts.api.serializers import UserSerializer
+
 
 class FriendshipSerializerForCreate(serializers.ModelSerializer):
     from_user_id = serializers.IntegerField()
@@ -14,7 +15,7 @@ class FriendshipSerializerForCreate(serializers.ModelSerializer):
     def validate(self, attrs):
         if attrs['from_user_id'] == attrs['to_user_id']:
             raise ValidationError({
-            'message': "from_user_id and to_user_id should be different"
+                'message': 'from_user_id and to_user_id should be different'
             })
         return attrs
 
