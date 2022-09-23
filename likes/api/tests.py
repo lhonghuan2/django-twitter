@@ -11,8 +11,8 @@ NEWSFEED_LIST_API = '/api/newsfeeds/'
 class LikeApiTests(TestCase):
 
     def setUp(self):
-        self.linghu, self.linghu_client = self.create_user_and_cliet('linghu')
-        self.dongxie, self.dongxie_client = self.create_user_and_cliet('dongxie')
+        self.linghu, self.linghu_client = self.create_user_and_client('linghu')
+        self.dongxie, self.dongxie_client = self.create_user_and_client('dongxie')
 
     def test_tweet_likes(self):
         tweet = self.create_tweet(self.linghu)
