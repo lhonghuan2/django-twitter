@@ -65,6 +65,10 @@ class AccountViewSet(viewsets.GenericViewSet):
             }, status=400)
 
         user = serializer.save()
+
+        #create user profile object
+        user.profile
+
         django_login(request, user)
         return Response({
             'success': True,
