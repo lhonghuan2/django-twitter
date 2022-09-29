@@ -2,7 +2,9 @@ from testing.testcases import TestCase
 from inbox.services import NotificationService
 from notifications.models import Notification
 
+
 class NotificationServiceTests(TestCase):
+
     def setUp(self):
         self.linghu = self.create_user('linghu')
         self.dongxie = self.create_user('dongxie')
@@ -26,6 +28,6 @@ class NotificationServiceTests(TestCase):
         self.assertEqual(Notification.objects.count(), 0)
 
         # dispatch notification if tweet user != comment user
-        like = self.create_like(self.dongxie, self.linghu_tweet)
-        NotificationService.send_like_notification(like)
+        like = self.create_comment(self.dongxie, self.linghu_tweet)
+        NotificationService.send_comment_notification(like)
         self.assertEqual(Notification.objects.count(), 1)

@@ -25,7 +25,7 @@ def required_params(method='GET', params=None):
                     'message': u'missing {} in request'.format(params_str),
                     'success': False,
                 }, status=status.HTTP_400_BAD_REQUEST)
+
             return view_func(instance, request, *args, **kwargs)
         return _wrapped_view
     return decorator
-

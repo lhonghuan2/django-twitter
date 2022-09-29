@@ -20,16 +20,16 @@ class NewsFeedApiTests(TestCase):
         self.dongxie_client = APIClient()
         self.dongxie_client.force_authenticate(self.dongxie)
 
+        # create followings and followers for dongxie
         for i in range(2):
-            user = 'dongxie_follower{}'.format(i)
-            follower = self.create_user(user)
+            follower = self.create_user('dongxie_follower{}'.format(i))
             Friendship.objects.create(from_user=follower, to_user=self.dongxie)
         for i in range(3):
-            user = 'dongxie_following{}'.format(i)
-            following = self.create_user(user)
+            following = self.create_user('dongxie_following{}'.format(i))
             Friendship.objects.create(from_user=self.dongxie, to_user=following)
 
     def test_list(self):
+
         response = self.anonymous_client.get(NEWSFEEDS_URL)
         self.assertEqual(response.status_code, 403)
 

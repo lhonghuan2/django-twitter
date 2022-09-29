@@ -10,6 +10,7 @@ from friendships.api.serializers import (
 )
 from django.contrib.auth.models import User
 
+
 class FriendshipViewSet(viewsets.GenericViewSet):
     queryset = User.objects.all()
 
@@ -57,6 +58,7 @@ class FriendshipViewSet(viewsets.GenericViewSet):
                 'success': False,
                 'message': 'You cannot unfollow yourself',
             }, status=status.HTTP_400_BAD_REQUEST)
+
         deleted, _ = Friendship.objects.filter(
             from_user=request.user,
             to_user=pk,

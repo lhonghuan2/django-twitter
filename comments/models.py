@@ -1,8 +1,8 @@
 from django.contrib.auth.models import User
-from django.db import models
 from django.contrib.contenttypes.models import ContentType
-from tweets.models import Tweet
+from django.db import models
 from likes.models import Like
+from tweets.models import Tweet
 
 
 class Comment(models.Model):
