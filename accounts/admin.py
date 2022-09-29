@@ -1,7 +1,7 @@
 from django.contrib import admin
+from accounts.models import UserProfile
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.models import User
-from accounts.models import UserProfile
 
 
 @admin.register(UserProfile)
@@ -19,9 +19,9 @@ class UserProfileInline(admin.StackedInline):
 class UserAdmin(BaseUserAdmin):
     list_display = ('username', 'email', 'is_staff', 'date_joined')
     date_hierarchy = 'date_joined'
-    inlines = (UserProfileInline, )
+    inlines = (UserProfileInline,)
 
 
+# Re-register UserAdmin
 admin.site.unregister(User)
 admin.site.register(User, UserAdmin)
-

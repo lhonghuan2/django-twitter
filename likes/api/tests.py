@@ -1,12 +1,14 @@
 from testing.testcases import TestCase
 from rest_framework.test import APIClient
 
+
 LIKE_BASE_URL = '/api/likes/'
 LIKE_CANCEL_URL = '/api/likes/cancel/'
 COMMENT_LIST_API = '/api/comments/'
 TWEET_LIST_API = '/api/tweets/'
 TWEET_DETAIL_API = '/api/tweets/{}/'
 NEWSFEED_LIST_API = '/api/newsfeeds/'
+
 
 class LikeApiTests(TestCase):
 
@@ -31,7 +33,7 @@ class LikeApiTests(TestCase):
         self.assertEqual(response.status_code, 201)
         self.assertEqual(tweet.like_set.count(), 1)
 
-        #duplicate likes
+        # duplicate likes
         self.linghu_client.post(LIKE_BASE_URL, data)
         self.assertEqual(tweet.like_set.count(), 1)
         self.dongxie_client.post(LIKE_BASE_URL, data)
@@ -50,7 +52,7 @@ class LikeApiTests(TestCase):
         response = self.linghu_client.get(LIKE_BASE_URL, data)
         self.assertEqual(response.status_code, 405)
 
-        # wrong content type
+        # wrong content_type
         response = self.linghu_client.post(LIKE_BASE_URL, {
             'content_type': 'coment',
             'object_id': comment.id,
@@ -58,21 +60,21 @@ class LikeApiTests(TestCase):
         self.assertEqual(response.status_code, 400)
         self.assertEqual('content_type' in response.data['errors'], True)
 
-        # wrong object id
+        # wrong object_id
         response = self.linghu_client.post(LIKE_BASE_URL, {
             'content_type': 'comment',
             'object_id': -1,
         })
         self.assertEqual(response.status_code, 400)
-        self.assertEqual('object_id' in response.data['errors'], True)
+        self.assertEqual('object_id'in response.data['errors'], True)
 
         # post success
         response = self.linghu_client.post(LIKE_BASE_URL, data)
         self.assertEqual(response.status_code, 201)
         self.assertEqual(comment.like_set.count(), 1)
 
-        #duplicate likes
-        self.linghu_client.post(LIKE_BASE_URL, data)
+        # duplicate likes
+        response = self.linghu_client.post(LIKE_BASE_URL, data)
         self.assertEqual(response.status_code, 201)
         self.assertEqual(comment.like_set.count(), 1)
         self.dongxie_client.post(LIKE_BASE_URL, data)
@@ -96,7 +98,7 @@ class LikeApiTests(TestCase):
         response = self.linghu_client.get(LIKE_CANCEL_URL, like_comment_data)
         self.assertEqual(response.status_code, 405)
 
-        # wrong content type
+        # wrong content_type
         response = self.linghu_client.post(LIKE_CANCEL_URL, {
             'content_type': 'wrong',
             'object_id': 1,
@@ -128,7 +130,7 @@ class LikeApiTests(TestCase):
         self.assertEqual(tweet.like_set.count(), 1)
         self.assertEqual(comment.like_set.count(), 0)
 
-        # successfully canceled
+        # dongxie's like has been canceled
         response = self.dongxie_client.post(LIKE_CANCEL_URL, like_tweet_data)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(tweet.like_set.count(), 0)
@@ -145,7 +147,7 @@ class LikeApiTests(TestCase):
         self.assertEqual(response.data['comments'][0]['has_liked'], False)
         self.assertEqual(response.data['comments'][0]['likes_count'], 0)
 
-        # test comments in list api
+        # test comments list api
         response = self.dongxie_client.get(COMMENT_LIST_API, {'tweet_id': tweet.id})
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['comments'][0]['has_liked'], False)
@@ -177,7 +179,7 @@ class LikeApiTests(TestCase):
         self.assertEqual(response.data['has_liked'], True)
         self.assertEqual(response.data['likes_count'], 1)
 
-        # test tweet list api
+        # test tweets list api
         response = self.dongxie_client.get(TWEET_LIST_API, {'user_id': self.linghu.id})
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['tweets'][0]['has_liked'], True)

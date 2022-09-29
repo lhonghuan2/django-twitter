@@ -1,13 +1,14 @@
-from rest_framework.test import APIClient
-from django.utils import timezone
-from testing.testcases import TestCase
 from comments.models import Comment
+from django.utils import timezone
+from rest_framework.test import APIClient
+from testing.testcases import TestCase
 
 
 COMMENT_URL = '/api/comments/'
 TWEET_LIST_API = '/api/tweets/'
 TWEET_DETAIL_API = '/api/tweets/{}/'
 NEWSFEED_LIST_API = '/api/newsfeeds/'
+
 
 class CommentApiTests(TestCase):
 
@@ -22,23 +23,18 @@ class CommentApiTests(TestCase):
         self.tweet = self.create_tweet(self.linghu)
 
     def test_create(self):
-        # anonymous cannot create comment
         response = self.anonymous_client.post(COMMENT_URL)
         self.assertEqual(response.status_code, 403)
 
-        # cannot create comment without any parameters
         response = self.linghu_client.post(COMMENT_URL)
         self.assertEqual(response.status_code, 400)
 
-        # cannot create comment with only tweet_id
         response = self.linghu_client.post(COMMENT_URL, {'tweet_id': self.tweet.id})
         self.assertEqual(response.status_code, 400)
 
-        # cannot create comment with only content
         response = self.linghu_client.post(COMMENT_URL, {'content': '1'})
         self.assertEqual(response.status_code, 400)
 
-        # comment cannot be too long
         response = self.linghu_client.post(COMMENT_URL, {
             'tweet_id': self.tweet.id,
             'content': '1' * 141,
@@ -46,7 +42,6 @@ class CommentApiTests(TestCase):
         self.assertEqual(response.status_code, 400)
         self.assertEqual('content' in response.data['errors'], True)
 
-        # comment should include both tweet_id and content
         response = self.linghu_client.post(COMMENT_URL, {
             'tweet_id': self.tweet.id,
             'content': '1',
@@ -56,22 +51,34 @@ class CommentApiTests(TestCase):
         self.assertEqual(response.data['tweet_id'], self.tweet.id)
         self.assertEqual(response.data['content'], '1')
 
+    def test_destroy(self):
+        comment = self.create_comment(self.linghu, self.tweet)
+        url = '{}{}/'.format(COMMENT_URL, comment.id)
+
+        response = self.anonymous_client.delete(url)
+        self.assertEqual(response.status_code, 403)
+
+        response = self.dongxie_client.delete(url)
+        self.assertEqual(response.status_code, 403)
+
+        count = Comment.objects.count()
+        response = self.linghu_client.delete(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(Comment.objects.count(), count - 1)
+
     def test_update(self):
         comment = self.create_comment(self.linghu, self.tweet, 'original')
         another_tweet = self.create_tweet(self.dongxie)
-        url = '{}{}/'.format(COMMENT_URL,comment.id)
+        url = '{}{}/'.format(COMMENT_URL, comment.id)
 
-        # anonymous users cannot update comments
         response = self.anonymous_client.put(url, {'content': 'new'})
         self.assertEqual(response.status_code, 403)
 
-        # non-comment owners cannot update comments
         response = self.dongxie_client.put(url, {'content': 'new'})
         self.assertEqual(response.status_code, 403)
         comment.refresh_from_db()
         self.assertNotEqual(comment.content, 'new')
 
-        #could not update the parameters other than content
         before_updated_at = comment.updated_at
         before_created_at = comment.created_at
         now = timezone.now()
@@ -90,37 +97,16 @@ class CommentApiTests(TestCase):
         self.assertNotEqual(comment.created_at, now)
         self.assertNotEqual(comment.updated_at, before_updated_at)
 
-    def test_destroy(self):
-        comment = self.create_comment(self.linghu, self.tweet)
-        url = '{}{}/'.format(COMMENT_URL,comment.id)
-
-        # anonymous users cannot delete comments
-        response = self.anonymous_client.delete(url)
-        self.assertEqual(response.status_code, 403)
-
-        # non-comment owners cannot delete comments
-        response = self.dongxie_client.delete(url)
-        self.assertEqual(response.status_code, 403)
-
-        # comment owner could delete
-        count = Comment.objects.count()
-        response = self.linghu_client.delete(url)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(Comment.objects.count(), count - 1)
-
     def test_list(self):
-        # should include tweet_id to visit comments
         response = self.anonymous_client.get(COMMENT_URL)
         self.assertEqual(response.status_code, 400)
 
-        # you can visit comments with twitter_id, there is no comment at beginning
         response = self.anonymous_client.get(COMMENT_URL, {
             'tweet_id': self.tweet.id,
         })
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data['comments']), 0)
 
-        # comments are ordered by time
         self.create_comment(self.linghu, self.tweet, '1')
         self.create_comment(self.dongxie, self.tweet, '2')
         self.create_comment(self.dongxie, self.create_tweet(self.dongxie), '3')
@@ -131,7 +117,7 @@ class CommentApiTests(TestCase):
         self.assertEqual(response.data['comments'][0]['content'], '1')
         self.assertEqual(response.data['comments'][1]['content'], '2')
 
-        response = self.anonymous_client.get(COMMENT_URL,{
+        response = self.anonymous_client.get(COMMENT_URL, {
             'tweet_id': self.tweet.id,
             'user_id': self.linghu.id,
         })
@@ -157,6 +143,3 @@ class CommentApiTests(TestCase):
         response = self.dongxie_client.get(NEWSFEED_LIST_API)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['newsfeeds'][0]['tweet']['comments_count'], 2)
-
-
-

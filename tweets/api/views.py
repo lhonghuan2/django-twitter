@@ -42,6 +42,7 @@ class TweetViewSet(viewsets.GenericViewSet,
             context={'request': request},
             many=True,
         )
+
         return Response({'tweets': serializer.data})
 
     def create(self, request, *args, **kwargs):

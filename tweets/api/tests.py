@@ -25,20 +25,25 @@ class TweetApiTests(TestCase):
         ]
 
     def test_list_api(self):
+
         response = self.anonymous_client.get(TWEET_LIST_API)
         self.assertEqual(response.status_code, 400)
+
 
         response = self.anonymous_client.get(TWEET_LIST_API, {'user_id': self.user1.id})
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data['tweets']), 3)
         response = self.anonymous_client.get(TWEET_LIST_API, {'user_id': self.user2.id})
         self.assertEqual(len(response.data['tweets']), 2)
+
         self.assertEqual(response.data['tweets'][0]['id'], self.tweets2[1].id)
         self.assertEqual(response.data['tweets'][1]['id'], self.tweets2[0].id)
 
     def test_create_api(self):
+
         response = self.anonymous_client.post(TWEET_CREATE_API)
         self.assertEqual(response.status_code, 403)
+
 
         response = self.user1_client.post(TWEET_CREATE_API)
         self.assertEqual(response.status_code, 400)
@@ -51,6 +56,7 @@ class TweetApiTests(TestCase):
         })
         self.assertEqual(response.status_code, 400)
 
+
         tweets_count = Tweet.objects.count()
         response = self.user1_client.post(TWEET_CREATE_API, {
             'content': 'Hello World, this is my first tweet!'
@@ -60,6 +66,7 @@ class TweetApiTests(TestCase):
         self.assertEqual(Tweet.objects.count(), tweets_count + 1)
 
     def test_retrieve(self):
+        # tweet with id=-1 does not exist
         url = TWEET_RETRIEVE_API.format(-1)
         response = self.anonymous_client.get(url)
         self.assertEqual(response.status_code, 404)
@@ -74,3 +81,7 @@ class TweetApiTests(TestCase):
         self.create_comment(self.user1, tweet, 'hmm...')
         response = self.anonymous_client.get(url)
         self.assertEqual(len(response.data['comments']), 2)
+
+        profile = self.user1.profile
+        self.assertEqual(response.data['user']['nickname'], profile.nickname)
+        self.assertEqual(response.data['user']['avatar_url'], None)

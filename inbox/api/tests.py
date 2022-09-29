@@ -5,10 +5,12 @@ COMMENT_URL = '/api/comments/'
 LIKE_URL = '/api/likes/'
 NOTIFICATION_URL = '/api/notifications/'
 
+
 class NotificationTests(TestCase):
+
     def setUp(self):
         self.linghu, self.linghu_client = self.create_user_and_client('linghu')
-        self.dongxie, self.dongxie_client = self.create_user_and_client('dongxie')
+        self.dongxie, self.dongxie_client = self.create_user_and_client('dong')
         self.dongxie_tweet = self.create_tweet(self.dongxie)
 
     def test_comment_create_api_trigger_notification(self):
@@ -27,13 +29,15 @@ class NotificationTests(TestCase):
         })
         self.assertEqual(Notification.objects.count(), 1)
 
+
 class NotificationApiTests(TestCase):
+
     def setUp(self):
         self.linghu, self.linghu_client = self.create_user_and_client('linghu')
         self.dongxie, self.dongxie_client = self.create_user_and_client('dongxie')
         self.linghu_tweet = self.create_tweet(self.linghu)
 
-    def test_read_count(self):
+    def test_unread_count(self):
         self.dongxie_client.post(LIKE_URL, {
             'content_type': 'tweet',
             'object_id': self.linghu_tweet.id,
@@ -76,7 +80,6 @@ class NotificationApiTests(TestCase):
         response = self.linghu_client.get(unread_url)
         self.assertEqual(response.data['unread_count'], 0)
 
-
     def test_list(self):
         self.dongxie_client.post(LIKE_URL, {
             'content_type': 'tweet',
@@ -88,18 +91,17 @@ class NotificationApiTests(TestCase):
             'object_id': comment.id,
         })
 
-        # anonymous users cannot visit api
         response = self.anonymous_client.get(NOTIFICATION_URL)
         self.assertEqual(response.status_code, 403)
-        # dongxie does not have any notifications
+
         response = self.dongxie_client.get(NOTIFICATION_URL)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['count'], 0)
-        #linghu can see two notifications
+
         response = self.linghu_client.get(NOTIFICATION_URL)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['count'], 2)
-        # after mark as unread
+
         notification = self.linghu.notifications.first()
         notification.unread = False
         notification.save()
@@ -123,30 +125,30 @@ class NotificationApiTests(TestCase):
         notification = self.linghu.notifications.first()
 
         url = '/api/notifications/{}/'.format(notification.id)
-        # cannot use post, should use put
+
         response = self.dongxie_client.post(url, {'unread': False})
         self.assertEqual(response.status_code, 405)
-        # anonymous user cannot change notifications status
+
         response = self.anonymous_client.put(url, {'unread': False})
         self.assertEqual(response.status_code, 403)
-        # cannot change other people's notifications status
+
         response = self.dongxie_client.put(url, {'unread': False})
         self.assertEqual(response.status_code, 404)
-        # mark as read successfully
+
         response = self.linghu_client.put(url, {'unread': False})
         self.assertEqual(response.status_code, 200)
         unread_url = '/api/notifications/unread-count/'
         response = self.linghu_client.get(unread_url)
         self.assertEqual(response.data['unread_count'], 1)
 
-        # mark as unread again
-        self.linghu_client.put(url, {'unread': True})
+
+        response = self.linghu_client.put(url, {'unread': True})
         response = self.linghu_client.get(unread_url)
         self.assertEqual(response.data['unread_count'], 2)
-        # key word should have unread
+
         response = self.linghu_client.put(url, {'verb': 'newverb'})
         self.assertEqual(response.status_code, 400)
-        # cannot update other information
+
         response = self.linghu_client.put(url, {'verb': 'newverb', 'unread': False})
         self.assertEqual(response.status_code, 200)
         notification.refresh_from_db()

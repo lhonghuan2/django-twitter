@@ -1,18 +1,18 @@
-from django_filters.rest_framework import DjangoFilterBackend
+from inbox.api.serializers import (
+    NotificationSerializer,
+    NotificationSerializerForUpdate,
+)
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from inbox.api.serializer import (
-    NotificationSerializer,
-    NotificationSerializerForUpdate,
-)
 from utils.decorators import required_params
 
 
 class NotificationViewSet(
     viewsets.GenericViewSet,
-    viewsets.mixins.ListModelMixin, ):
+    viewsets.mixins.ListModelMixin,
+):
     serializer_class = NotificationSerializer
     permission_classes = (IsAuthenticated,)
     filterset_fields = ('unread',)
@@ -32,6 +32,7 @@ class NotificationViewSet(
 
     @required_params(method='POST', params=['unread'])
     def update(self, request, *args, **kwargs):
+
         serializer = NotificationSerializerForUpdate(
             instance=self.get_object(),
             data=request.data,
