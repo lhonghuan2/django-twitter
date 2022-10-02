@@ -1,0 +1,1 @@
+FOLLOWINGS_PATH = 'followings:{user_id}'
