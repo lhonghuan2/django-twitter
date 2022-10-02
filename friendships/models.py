@@ -19,9 +19,7 @@ class Friendship(models.Model):
 
     class Meta:
         index_together = (
-            # 获取我关注的所有人，按照关注时间排序
             ('from_user_id', 'created_at'),
-            # 获得关注我的所有人，按照关注时间排序
             ('to_user_id', 'created_at'),
         )
         unique_together = (('from_user_id', 'to_user_id'),)

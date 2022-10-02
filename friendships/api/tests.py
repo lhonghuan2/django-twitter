@@ -13,6 +13,7 @@ FOLLOWINGS_URL = '/api/friendships/{}/followings/'
 class FriendshipApiTests(TestCase):
 
     def setUp(self):
+        self.clear_cache()
         self.linghu = self.create_user('linghu')
         self.linghu_client = APIClient()
         self.linghu_client.force_authenticate(self.linghu)
@@ -31,6 +32,7 @@ class FriendshipApiTests(TestCase):
 
     def test_follow(self):
         url = FOLLOW_URL.format(self.linghu.id)
+
 
         response = self.anonymous_client.post(url)
         self.assertEqual(response.status_code, 403)
@@ -55,7 +57,6 @@ class FriendshipApiTests(TestCase):
 
     def test_unfollow(self):
         url = UNFOLLOW_URL.format(self.linghu.id)
-
 
         response = self.anonymous_client.post(url)
         self.assertEqual(response.status_code, 403)
