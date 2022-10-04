@@ -27,6 +27,7 @@ class TweetTests(TestCase):
         self.assertEqual(self.tweet.like_set.count(), 2)
 
     def test_create_photo(self):
+        # test for photo creating
         photo = TweetPhoto.objects.create(
             tweet=self.tweet,
             user=self.linghu,
