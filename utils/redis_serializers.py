@@ -4,7 +4,7 @@ from utils.json_encoder import JSONEncoder
 class DjangoModelSerializer:
 
     @classmethod
-    def serializers(cls, instance):
+    def serialize(cls, instance):
         return serializers.serialize('json', [instance], cls=JSONEncoder)
 
     @classmethod
