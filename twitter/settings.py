@@ -153,9 +153,9 @@ if TESTING:
 AWS_STORAGE_BUCKET_NAME = 'django-twitter'
 AWS_S3_REGION_NAME = 'us-west-1'
 
-
 MEDIA_ROOT = 'media/'
 
+# https://docs.djangoproject.com/en/3.1/topics/cache/
 CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.memcached.PyLibMCCache',
@@ -173,7 +173,8 @@ CACHES = {
 REDIS_HOST = '127.0.0.1'
 REDIS_PORT = 6379
 REDIS_DB = 0 if TESTING else 1
-REDIS_KEY_EXPIRE_TIME = 7 * 86400 # in seconds
+REDIS_KEY_EXPIRE_TIME = 7 * 86400  # in seconds
+REDIS_LIST_LENGTH_LIMIT = 1000 if not TESTING else 20
 
 try:
     from .local_settings import *

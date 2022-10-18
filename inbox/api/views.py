@@ -32,7 +32,6 @@ class NotificationViewSet(
 
     @required_params(method='POST', params=['unread'])
     def update(self, request, *args, **kwargs):
-
         serializer = NotificationSerializerForUpdate(
             instance=self.get_object(),
             data=request.data,

@@ -1,14 +1,16 @@
-from testing.testcases import TestCase
 from datetime import timedelta
-from utils.time_helpers import utc_now
-from utils.redis_client import RedisClient
-from utils.redis_serializers import DjangoModelSerializer
+from testing.testcases import TestCase
 from tweets.constants import TweetPhotoStatus
 from tweets.models import TweetPhoto
 from tweets.services import TweetService
 from twitter.cache import USER_TWEETS_PATTERN
+from utils.redis_client import RedisClient
+from utils.redis_serializers import DjangoModelSerializer
+from utils.time_helpers import utc_now
+
 
 class TweetTests(TestCase):
+
     def setUp(self):
         self.clear_cache()
         self.linghu = self.create_user('linghu')
@@ -31,7 +33,6 @@ class TweetTests(TestCase):
         self.assertEqual(self.tweet.like_set.count(), 2)
 
     def test_create_photo(self):
-        # test for photo creating
         photo = TweetPhoto.objects.create(
             tweet=self.tweet,
             user=self.linghu,
@@ -52,7 +53,9 @@ class TweetTests(TestCase):
         cached_tweet = DjangoModelSerializer.deserialize(data)
         self.assertEqual(tweet, cached_tweet)
 
+
 class TweetServiceTests(TestCase):
+
     def setUp(self):
         self.clear_cache()
         self.linghu = self.create_user('linghu')
@@ -69,13 +72,13 @@ class TweetServiceTests(TestCase):
 
         # cache miss
         tweets = TweetService.get_cached_tweets(self.linghu.id)
-        self.assertEqual(tweets, None)
+        self.assertEqual([t.id for t in tweets], tweet_ids)
 
         # cache hit
         tweets = TweetService.get_cached_tweets(self.linghu.id)
         self.assertEqual([t.id for t in tweets], tweet_ids)
 
-        # cache update
+        # cache updated
         new_tweet = self.create_tweet(self.linghu, 'new tweet')
         tweets = TweetService.get_cached_tweets(self.linghu.id)
         tweet_ids.insert(0, new_tweet.id)
@@ -89,10 +92,8 @@ class TweetServiceTests(TestCase):
 
         key = USER_TWEETS_PATTERN.format(user_id=self.linghu.id)
         self.assertEqual(conn.exists(key), False)
-        tweet2 = self.create_tweet(self.linghu, 'tweets2')
+        tweet2 = self.create_tweet(self.linghu, 'tweet2')
         self.assertEqual(conn.exists(key), True)
 
         tweets = TweetService.get_cached_tweets(self.linghu.id)
         self.assertEqual([t.id for t in tweets], [tweet2.id, tweet1.id])
-
-

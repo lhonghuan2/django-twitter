@@ -48,21 +48,17 @@ class FriendshipViewSet(viewsets.GenericViewSet):
                 'errors': serializer.errors,
             }, status=status.HTTP_400_BAD_REQUEST)
         serializer.save()
-        FriendshipService.invalidate_followings_cache(request.user.id)
         return Response({'success': True}, status=status.HTTP_201_CREATED)
 
     @action(methods=['POST'], detail=True, permission_classes=[IsAuthenticated])
     def unfollow(self, request, pk):
-        # 注意 pk 的类型是 str，所以要做类型转换
         if request.user.id == int(pk):
             return Response({
                 'success': False,
                 'message': 'You cannot unfollow yourself',
             }, status=status.HTTP_400_BAD_REQUEST)
-
         deleted, _ = Friendship.objects.filter(
             from_user=request.user,
             to_user=pk,
         ).delete()
-        FriendshipService.invalidate_followings_cache(request.user.id)
         return Response({'success': True, 'deleted': deleted})

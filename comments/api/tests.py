@@ -99,6 +99,7 @@ class CommentApiTests(TestCase):
         self.assertNotEqual(comment.updated_at, before_updated_at)
 
     def test_list(self):
+
         response = self.anonymous_client.get(COMMENT_URL)
         self.assertEqual(response.status_code, 400)
 

@@ -1,6 +1,7 @@
-from testing.testcases import TestCase
 from friendships.models import Friendship
 from friendships.services import FriendshipService
+from testing.testcases import TestCase
+
 
 class FriendshipServiceTests(TestCase):
 
@@ -14,13 +15,10 @@ class FriendshipServiceTests(TestCase):
         user2 = self.create_user('user2')
         for to_user in [user1, user2, self.dongxie]:
             Friendship.objects.create(from_user=self.linghu, to_user=to_user)
-        FriendshipService.invalidate_followings_cache(self.linghu.id)
 
         user_id_set = FriendshipService.get_following_user_id_set(self.linghu.id)
-        self.assertEqual(user_id_set, {user1.id, user2.id, self.dongxie.id})
+        self.assertSetEqual(user_id_set, {user1.id, user2.id, self.dongxie.id})
 
         Friendship.objects.filter(from_user=self.linghu, to_user=self.dongxie).delete()
-        FriendshipService.invalidate_followings_cache(self.linghu.id)
         user_id_set = FriendshipService.get_following_user_id_set(self.linghu.id)
-        self.assertEqual(user_id_set, {user1.id, user2.id})
-
+        self.assertSetEqual(user_id_set, {user1.id, user2.id})

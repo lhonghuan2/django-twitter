@@ -1,6 +1,7 @@
 from django.core import serializers
 from utils.json_encoder import JSONEncoder
 
+
 class DjangoModelSerializer:
 
     @classmethod
@@ -9,4 +10,4 @@ class DjangoModelSerializer:
 
     @classmethod
     def deserialize(cls, serialized_data):
-        return  list(serializers.deserialize('json', serialized_data))[0].object
+        return list(serializers.deserialize('json', serialized_data))[0].object

@@ -14,6 +14,7 @@ USER_PROFILE_DETAIL_URL = '/api/profiles/{}/'
 class AccountApiTests(TestCase):
 
     def setUp(self):
+        self.clear_cache()
         self.client = APIClient()
         self.user = self.create_user(
             username='admin',
@@ -26,13 +27,16 @@ class AccountApiTests(TestCase):
             'username': self.user.username,
             'password': 'correct password',
         })
+
         self.assertEqual(response.status_code, 405)
+
 
         response = self.client.post(LOGIN_URL, {
             'username': self.user.username,
             'password': 'wrong password',
         })
         self.assertEqual(response.status_code, 400)
+
 
         response = self.client.get(LOGIN_STATUS_URL)
         self.assertEqual(response.data['has_logged_in'], False)
@@ -49,15 +53,19 @@ class AccountApiTests(TestCase):
         self.assertEqual(response.data['has_logged_in'], True)
 
     def test_logout(self):
+
         self.client.post(LOGIN_URL, {
             'username': self.user.username,
             'password': 'correct password',
         })
+
         response = self.client.get(LOGIN_STATUS_URL)
         self.assertEqual(response.data['has_logged_in'], True)
 
+
         response = self.client.get(LOGOUT_URL)
         self.assertEqual(response.status_code, 405)
+
 
         response = self.client.post(LOGOUT_URL)
         self.assertEqual(response.status_code, 200)
@@ -71,8 +79,10 @@ class AccountApiTests(TestCase):
             'email': 'someone@jiuzhang.com',
             'password': 'any password',
         }
+
         response = self.client.get(SIGNUP_URL, data)
         self.assertEqual(response.status_code, 405)
+
 
         response = self.client.post(SIGNUP_URL, {
             'username': 'someone',
@@ -82,6 +92,7 @@ class AccountApiTests(TestCase):
         # print(response.data)
         self.assertEqual(response.status_code, 400)
 
+
         response = self.client.post(SIGNUP_URL, {
             'username': 'someone',
             'email': 'someone@jiuzhang.com',
@@ -90,6 +101,7 @@ class AccountApiTests(TestCase):
         # print(response.data)
         self.assertEqual(response.status_code, 400)
 
+
         response = self.client.post(SIGNUP_URL, {
             'username': 'username is tooooooooooooooooo loooooooong',
             'email': 'someone@jiuzhang.com',
@@ -97,6 +109,7 @@ class AccountApiTests(TestCase):
         })
         # print(response.data)
         self.assertEqual(response.status_code, 400)
+
 
         response = self.client.post(SIGNUP_URL, data)
         self.assertEqual(response.status_code, 201)

@@ -1,9 +1,11 @@
-from testing.testcases import TestCase
 from newsfeeds.services import NewsFeedService
+from testing.testcases import TestCase
 from twitter.cache import USER_NEWSFEEDS_PATTERN
-from utils.redis_helper import RedisClient
+from utils.redis_client import RedisClient
+
 
 class NewsFeedServiceTests(TestCase):
+
     def setUp(self):
         self.clear_cache()
         self.linghu = self.create_user('linghu')
@@ -45,4 +47,3 @@ class NewsFeedServiceTests(TestCase):
 
         feeds = NewsFeedService.get_cached_newsfeeds(self.linghu.id)
         self.assertEqual([f.id for f in feeds], [feed2.id, feed1.id])
-

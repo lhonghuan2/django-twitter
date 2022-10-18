@@ -67,6 +67,7 @@ class CommentViewSet(viewsets.GenericViewSet):
             raise Response({
                 'message': 'Please check input'
             }, status=status.HTTP_400_BAD_REQUEST)
+
         comment = serializer.save()
         return Response(
             CommentSerializer(comment, context={'request': request}).data,
