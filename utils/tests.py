@@ -1,7 +1,9 @@
 from testing.testcases import TestCase
 from utils.redis_client import RedisClient
 
+
 class UtilsTests(TestCase):
+
     def setUp(self):
         RedisClient.clear()
 

@@ -92,6 +92,7 @@ class NotificationApiTests(TestCase):
             'object_id': comment.id,
         })
 
+
         response = self.anonymous_client.get(NOTIFICATION_URL)
         self.assertEqual(response.status_code, 403)
 

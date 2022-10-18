@@ -3,6 +3,7 @@ from django.core.cache import caches
 
 cache = caches['testing'] if settings.TESTING else caches['default']
 
+
 class MemcachedHelper:
 
     @classmethod
@@ -12,14 +13,14 @@ class MemcachedHelper:
     @classmethod
     def get_object_through_cache(cls, model_class, object_id):
         key = cls.get_key(model_class, object_id)
-
-        # if key in cache
+        # cache hit
         obj = cache.get(key)
         if obj:
             return obj
 
         # cache miss
         obj = model_class.objects.get(id=object_id)
+        # using default expire time
         cache.set(key, obj)
         return obj
 
